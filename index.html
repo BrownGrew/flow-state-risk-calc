@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flow State Risk Calc</title>
     <style>
-        /* General Setup */
         body {
-            font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #121212;
+            font-family: 'Inter', sans-serif;
+            background-color: #0f0f0f;
             color: #ffffff;
             display: flex;
             flex-direction: column;
@@ -17,96 +16,89 @@
             margin: 0;
             min-height: 100vh;
         }
-        h2 { color: #888; letter-spacing: 2px; text-transform: uppercase; font-size: 14px; margin-bottom: 30px; }
+        h2 { color: #555; letter-spacing: 2px; text-transform: uppercase; font-size: 14px; margin-bottom: 25px; }
         
-        /* Inputs & Button */
-        .input-group { width: 100%; max-width: 400px; margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-size: 14px; color: #aaa; }
+        .input-group { width: 100%; max-width: 400px; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-size: 12px; color: #888; font-weight: bold; }
         input {
             width: 100%;
-            padding: 15px;
-            background-color: #1e1e1e;
+            padding: 14px;
+            background-color: #1a1a1a;
             border: 1px solid #333;
-            border-radius: 8px;
+            border-radius: 10px;
             color: white;
-            font-size: 18px;
+            font-size: 16px;
             outline: none;
             box-sizing: border-box;
+            transition: 0.3s;
         }
-        input:focus { border-color: #00bcd4; }
+        input:focus { border-color: #00bcd4; background-color: #222; }
         
         button {
             width: 100%;
             max-width: 400px;
-            padding: 15px;
-            background-color: #00bcd4; /* Brighter blue for primary action */
+            padding: 16px;
+            background-color: #00bcd4;
             color: #121212;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 800;
             cursor: pointer;
             margin-top: 10px;
-            transition: all 0.2s ease;
+            text-transform: uppercase;
         }
-        button:active { opacity: 0.9; transform: scale(0.98); }
 
-        /* Result Card */
         #result-card {
-            margin-top: 30px;
+            margin-top: 25px;
             width: 100%;
             max-width: 400px;
-            padding: 20px;
-            border-radius: 12px;
+            padding: 25px;
+            border-radius: 15px;
             text-align: center;
             display: none;
             box-sizing: border-box;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            transition: background-color 0.5s, border-color 0.5s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .state-label { font-size: 38px; font-weight: 900; margin: 0; letter-spacing: 2px; text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); }
-        .risk-label { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 5px; margin-bottom: 20px; }
+        .state-label { font-size: 42px; font-weight: 900; margin: 0; line-height: 1; }
+        .risk-label { font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 25px; margin-top: 10px; }
         
-        .data-row { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 10px; 
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
-            padding-bottom: 5px; 
-        }
-        .data-title { font-size: 14px; color: #ccc; }
-        .data-value { font-size: 20px; font-weight: bold; }
+        .data-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
+        .data-value { font-size: 18px; font-weight: bold; }
 
-        /* Quote Section */
         #quote-display {
             width: 100%;
             max-width: 400px;
             margin-top: 25px;
             padding: 15px;
-            background-color: #1e1e1e;
-            border-radius: 8px;
-            border-left: 5px solid #00bcd4;
-            color: #d1d1d1;
+            background-color: #1a1a1a;
+            border-radius: 10px;
+            border-left: 4px solid #00bcd4;
             font-style: italic;
-            font-size: 14px;
-            text-align: left;
+            font-size: 13px;
+            color: #aaa;
             opacity: 0;
-            transition: opacity 0.5s ease-in-out;
+            transition: opacity 0.5s ease;
         }
 
-        /* State Colors */
-        .peak { background: linear-gradient(135deg, #198754, #0f5132); border: 1px solid #198754; }
-        .flow { background: linear-gradient(135deg, #0dcaf0, #055160); border: 1px solid #0dcaf0; }
-        .neutral { background: linear-gradient(135deg, #333, #444); border: 1px solid #555; }
-        .reset { 
-            background: linear-gradient(135deg, #ffc107, #664d03); 
-            color: #121212; 
-            border: 1px solid #ffc107; 
-        }
-        .reset .data-title, .reset .risk-label, .reset .data-value { color: #121212; }
-        .lockdown { background: linear-gradient(135deg, #dc3545, #842029); border: 1px solid #dc3545; }
+        /* State Styles */
+        .peak { background: linear-gradient(135deg, #198754, #146c43); }
+        .flow { background: linear-gradient(135deg, #0dcaf0, #0aa2c0); }
+        .neutral { background: #2c2c2c; }
+        .reset { background: #ffc107; color: #000; }
+        .reset .data-value, .reset .data-title, .reset .risk-label { color: #000; }
+        .lockdown { background: #dc3545; }
+        
+        /* Stop Trading Style */
+        .stop-trading { background: #000000; border: 4px solid #ff0000; animation: pulse-border 1.5s infinite; }
+        .stop-trading .state-label { color: #ff0000; }
 
+        @keyframes pulse-border {
+            0% { border-color: #ff0000; box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4); }
+            70% { border-color: #990000; box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); }
+            100% { border-color: #ff0000; box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+        }
     </style>
 </head>
 <body>
@@ -114,169 +106,102 @@
     <h2>Flow State Manager</h2>
 
     <div class="input-group">
-        <label for="startBal">Starting Balance ($)</label>
+        <label>Starting Balance ($)</label>
         <input type="number" id="startBal" placeholder="100000">
     </div>
 
     <div class="input-group">
-        <label for="currBal">Current Balance ($)</label>
-        <input type="number" id="currBal" placeholder="99500">
+        <label>Current Balance ($)</label>
+        <input type="number" id="currBal" placeholder="98500">
     </div>
 
-    <button onclick="calculateRisk()">CALCULATE POSITION</button>
-
-    <div id="result-card" class="neutral">
-        <h1 id="stateText" class="state-label">NEUTRAL</h1>
-        <p id="focusText" class="risk-label">Focus: Presence</p>
-
-        <div class="data-row">
-            <span class="data-title">PnL %</span>
-            <span id="pnlText" class="data-value">0.00%</span>
-        </div>
-        <div class="data-row">
-            <span class="data-title">Risk %</span>
-            <span id="riskPerText" class="data-value">1.0%</span>
-        </div>
-        <div class="data-row" style="border:none;">
-            <span class="data-title">Risk Amount ($)</span>
-            <span id="riskAmtText" class="data-value" style="font-size: 28px;">$1000.00</span>
-        </div>
+    <div class="input-group">
+        <label>Max Drawdown Limit (%)</label>
+        <input type="number" id="maxDD" value="10" step="0.1">
     </div>
 
-    <div id="quote-display">
-        "Risk comes from not knowing what you're doing."
+    <button onclick="calculateRisk()">Calculate Risk</button>
+
+    <div id="result-card">
+        <h1 id="stateText" class="state-label"></h1>
+        <p id="focusText" class="risk-label"></p>
+
+        <div class="data-row"><span class="data-title">Current PnL</span><span id="pnlText" class="data-value"></span></div>
+        <div class="data-row"><span class="data-title">Risk Percent</span><span id="riskPerText" class="data-value"></span></div>
+        <div class="data-row" style="border:none; margin-top: 10px;"><span class="data-title">Risk Amount</span><span id="riskAmtText" class="data-value" style="font-size: 28px; color: #fff;"></span></div>
     </div>
+
+    <div id="quote-display"></div>
 
     <script>
-        const motivationalQuotes = [
-            "The market will be here tomorrow. Protect your capital today.",
-            "You only risk what you've earned. Trade the house money.",
-            "Great trading is not about winning, but about surviving losses.",
-            "Risk is where the true edge is found, not entry signals.",
-            "When in doubt, size down. Uncertainty demands discipline.",
-            "The biggest risk is losing control of your emotions.",
-            "In 'Lockdown,' patience is your highest leverage.",
-            "Fear and greed are not signals. Stick to the system.",
-            "A small loss is a cheap lesson. A big loss is a mistake.",
-            "Your trade plan is your map. Your risk plan is your seatbelt.",
-            "Respect the drawdown. It's the market's way of testing your resolve.",
-            "PEAK flow is earned by consistent NEUTRAL execution.",
-            "Never risk the amount that makes the next trade emotional.",
-            "The master trader is the master risk manager.",
-            "Keep your losses small, and your wins will take care of themselves.",
-            "Sizing down is a tactical retreat, not a surrender.",
-            "Every trade is an opportunity, but risk management is the requirement.",
-            "Risk comes from not knowing what you're doing.",
-            "Trade the system. Trust the math. Ignore the noise.",
-            "Don't worry about the money; focus on the process.",
-            "The most valuable asset you own is your mental capital.",
-            "You are only as good as your worst risk management decision.",
-            "Successful traders measure risk before measuring profit.",
-            "Stay in 'Neutral' until the signal for 'Flow' is undeniable.",
-            "A 'Reset' is a chance to re-center. Use it wisely."
+        const quotes = [
+            "Protecting capital is your only job.",
+            "Trade the chart, not your emotions.",
+            "The best trade is sometimes no trade.",
+            "Discipline is doing what needs to be done.",
+            "Markets reward those who survive."
         ];
 
-        function getRandomQuote() {
-            const index = Math.floor(Math.random() * motivationalQuotes.length);
-            return motivationalQuotes[index];
-        }
-
-        function displayQuote() {
-            const quoteEl = document.getElementById('quote-display');
-            quoteEl.style.opacity = '0'; // Start fade out
-
-            setTimeout(() => {
-                quoteEl.innerText = '"' + getRandomQuote() + '"';
-                quoteEl.style.opacity = '1'; // Fade in
-            }, 500); // Wait for fade out to complete before changing text
-        }
-
+        // Load saved values on startup
+        window.onload = function() {
+            if(localStorage.getItem('userMaxDD')) document.getElementById('maxDD').value = localStorage.getItem('userMaxDD');
+            if(localStorage.getItem('userStartBal')) document.getElementById('startBal').value = localStorage.getItem('userStartBal');
+        };
 
         function calculateRisk() {
-            // Get inputs
             let start = parseFloat(document.getElementById('startBal').value);
             let current = parseFloat(document.getElementById('currBal').value);
+            let limitDD = parseFloat(document.getElementById('maxDD').value);
 
-            // Add basic check for validity
-            if (isNaN(start) || isNaN(current) || start <= 0) {
-                // Using console.error instead of alert per instructions
-                console.error("Please enter valid, positive numbers for the balances.");
-                document.getElementById('result-card').style.display = 'none';
-                return;
-            }
+            // Save Inputs
+            localStorage.setItem('userMaxDD', limitDD);
+            localStorage.setItem('userStartBal', start);
 
-            // Calculate PnL %
+            if (isNaN(start) || isNaN(current) || isNaN(limitDD)) return;
+
             let pnlPercent = ((current - start) / start) * 100;
+            let currentDD = Math.abs(pnlPercent);
             
-            // Variables for Logic
-            let state = "";
-            let riskPercent = 0;
-            let focus = "";
-            let cssClass = "";
+            let state, riskPercent, focus, cssClass;
 
-            // THE LOGIC ENGINE (Flow State Matrix)
-            // Rules are based on the final agreed-upon table:
-            // PEAK: > +5% (1.5%)
-            // FLOW: > +2.5% (1.25%)
-            // NEUTRAL: -0.49% to +2.5% (1.0%)
-            // RESET: <= -0.50% to -2.0% (0.5%)
-            // LOCKDOWN: <= -2% (0.25%)
-
-            if (pnlPercent > 5.0) {
-                state = "PEAK";
-                riskPercent = 1.5;
-                focus = "Maximize Flow";
-                cssClass = "peak";
+            // --- STOP TRADING LOGIC ---
+            if (pnlPercent <= -limitDD) {
+                state = "STOP"; 
+                riskPercent = 0; 
+                focus = "LIMIT REACHED - WALK AWAY"; 
+                cssClass = "stop-trading";
+            } 
+            // --- REGULAR FLOW LOGIC ---
+            else if (pnlPercent > 5.0) {
+                state = "PEAK"; riskPercent = 1.5; focus = "Maximize Flow"; cssClass = "peak";
             } else if (pnlPercent > 2.5) {
-                state = "FLOW";
-                riskPercent = 1.25;
-                focus = "Push Rhythm";
-                cssClass = "flow";
-            } else if (pnlPercent >= -0.49) { // Covers everything from -0.49% up to 2.5%
-                state = "NEUTRAL";
-                riskPercent = 1.0;
-                focus = "Presence";
-                cssClass = "neutral";
+                state = "FLOW"; riskPercent = 1.25; focus = "Push Rhythm"; cssClass = "flow";
+            } else if (pnlPercent >= -0.49) {
+                state = "NEUTRAL"; riskPercent = 1.0; focus = "Presence"; cssClass = "neutral";
             } else if (pnlPercent > -2.0) {
-                // Covers -0.5% down to -1.99%
-                state = "RESET";
-                riskPercent = 0.5;
-                focus = "Re-center";
-                cssClass = "reset";
+                state = "RESET"; riskPercent = 0.5; focus = "Re-center"; cssClass = "reset";
             } else {
-                // -2.0% or worse
-                state = "LOCKDOWN";
-                riskPercent = 0.25;
-                focus = "Protect Capital";
-                cssClass = "lockdown";
+                state = "LOCKDOWN"; riskPercent = 0.25; focus = "Capital Protection"; cssClass = "lockdown";
             }
 
-            // Calculate Dollar Risk based on CURRENT balance
             let riskAmount = current * (riskPercent / 100);
 
-            // Update UI
-            let card = document.getElementById('result-card');
+            // UI Update
+            const card = document.getElementById('result-card');
             card.style.display = 'block';
-            card.className = cssClass; // Apply color theme
-
+            card.className = cssClass;
+            
             document.getElementById('stateText').innerText = state;
-            document.getElementById('focusText').innerText = "Focus: " + focus;
+            document.getElementById('focusText').innerText = focus;
             document.getElementById('pnlText').innerText = pnlPercent.toFixed(2) + "%";
             document.getElementById('riskPerText').innerText = riskPercent + "%";
-            document.getElementById('riskAmtText').innerText = "$" + riskAmount.toFixed(2);
-            
-            displayQuote(); // Show the random quote
-        }
+            document.getElementById('riskAmtText').innerText = state === "STOP" ? "$0.00" : "$" + riskAmount.toLocaleString(undefined, {minimumFractionDigits: 2});
 
-        // Initialize with a quote
-        window.onload = function() {
-            displayQuote(); 
-            // Attempt to trigger a calculation on load with placeholder values
-            document.getElementById('startBal').value = '100000';
-            document.getElementById('currBal').value = '100000';
-            calculateRisk();
+            // Quote display
+            const qBox = document.getElementById('quote-display');
+            qBox.innerText = `"${quotes[Math.floor(Math.random()*quotes.length)]}"`;
+            qBox.style.opacity = 1;
         }
     </script>
 </body>
 </html>
-
