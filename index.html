@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flow State Elastic Calc</title>
+    <title>Flow State Elastic v3.1</title>
     <style>
+        /* CSS remains consistent for a clean, professional dark theme */
         body { font-family: 'Inter', sans-serif; background-color: #0f0f0f; color: #ffffff; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; min-height: 100vh; }
         h2 { color: #555; letter-spacing: 2px; text-transform: uppercase; font-size: 14px; margin-bottom: 25px; }
         .input-group { width: 100%; max-width: 400px; margin-bottom: 15px; }
@@ -18,7 +19,6 @@
         .data-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
         .data-value { font-size: 18px; font-weight: bold; }
         
-        /* State Backgrounds */
         .peak { background: linear-gradient(135deg, #198754, #146c43); }
         .flow { background: linear-gradient(135deg, #0dcaf0, #0aa2c0); }
         .neutral { background: #2c2c2c; }
@@ -31,7 +31,7 @@
 </head>
 <body>
 
-    <h2>Flow State Manager v3.0</h2>
+    <h2>Flow State Manager v3.1</h2>
 
     <div class="input-group">
         <label>Starting Balance ($)</label>
@@ -48,7 +48,7 @@
         <input type="number" id="maxDD" value="10" step="0.1">
     </div>
 
-    <button onclick="calculateRisk()">Calculate Elastic Risk</button>
+    <button onclick="calculateRisk()">Calculate Elastic System</button>
 
     <div id="result-card">
         <h1 id="stateText" class="state-label"></h1>
@@ -77,13 +77,15 @@
 
             let pnlPercent = ((current - start) / start) * 100;
             
-            // SCALE FACTOR: This is the magic. 
-            // If limitDD is 10, ratio is 1. If limitDD is 5, ratio is 0.5.
+            // ELASTIC RATIO
             let ratio = limitDD / 10;
 
             let state, baseRisk, focus, cssClass;
 
-            // Define Base Risks (for 10% DD)
+            // ACCT CONDITION TRIGGERS (Scaled by ratio)
+            const neutralTrigger = -0.99 * ratio;
+            const resetTrigger = -3.5 * ratio;
+
             if (pnlPercent <= -limitDD) {
                 state = "STOP"; baseRisk = 0; focus = "WALK AWAY"; cssClass = "stop-trading";
             } 
@@ -91,15 +93,15 @@
                 state = "PEAK"; baseRisk = 1.5; focus = "Maximize Flow"; cssClass = "peak";
             } else if (pnlPercent > 2.5) {
                 state = "FLOW"; baseRisk = 1.25; focus = "Push Rhythm"; cssClass = "flow";
-            } else if (pnlPercent >= -0.99) {
+            } else if (pnlPercent >= neutralTrigger) {
                 state = "NEUTRAL"; baseRisk = 1.0; focus = "Presence"; cssClass = "neutral";
-            } else if (pnlPercent >= -3.5) {
+            } else if (pnlPercent >= resetTrigger) {
                 state = "RESET"; baseRisk = 0.5; focus = "Re-center"; cssClass = "reset";
             } else {
                 state = "LOCKDOWN"; baseRisk = 0.25; focus = "Survival Mode"; cssClass = "lockdown";
             }
 
-            // Apply the Elastic Ratio
+            // Apply Elastic Risk
             let finalRiskPercent = baseRisk * ratio;
             let riskAmount = start * (finalRiskPercent / 100);
 
